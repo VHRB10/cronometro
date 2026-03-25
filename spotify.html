@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nossa Retrospectiva</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        :root {
+            --spotify-orange: #b33a06;
+            --spotify-bright-orange: #ff5500;
+            --bg-dark: #121212;
+            --card-gray: #282828;
+        }
+
+        body {
+            background-color: var(--bg-dark);
+            color: white;
+            font-family: 'Segoe UI', sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 450px;
+            background: linear-gradient(to bottom, var(--spotify-orange), var(--bg-dark) 40%);
+            min-height: 100vh;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .main-photo {
+            width: 100%;
+            aspect-ratio: 1/1;
+            border-radius: 8px;
+            object-fit: cover;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .song-info {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .song-info h2 { margin: 0; font-size: 20px; }
+        .song-info p { margin: 5px 0; color: #b3b3b3; font-weight: bold; }
+
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background: rgba(255,255,255,0.3);
+            border-radius: 2px;
+            margin: 25px 0 10px;
+            cursor: pointer;
+            position: relative;
+        }
+        #progress-bar-fill {
+            height: 100%;
+            width: 0%;
+            background: white;
+            border-radius: 2px;
+        }
+
+        .time { display: flex; justify-content: space-between; font-size: 12px; color: #b3b3b3; }
+
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 20px 0 40px;
+            font-size: 24px;
+        }
+
+        .play-pause-btn {
+            background: white;
+            color: var(--spotify-orange);
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            border: none;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 25px;
+            cursor: pointer;
+        }
+
+        .card {
+            background-color: var(--card-gray);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+            position: relative;
+        }
+
+        .couple-photo {
+            width: 100%;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            object-fit: cover;
+        }
+
+        .overlay-text {
+            position: absolute;
+            top: 35px; left: 35px;
+            font-weight: bold; font-size: 18px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+        }
+
+        .timer-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .timer-box {
+            background: #333;
+            padding: 12px 5px;
+            border-radius: 8px;
+            text-align: center;
+        }
+        .timer-box span { display: block; font-weight: bold; font-size: 18px; }
+        .timer-box small { color: #aaa; font-size: 10px; text-transform: uppercase; }
+
+        .msg-special {
+            background-color: var(--spotify-bright-orange);
+            padding: 20px;
+            border-radius: 15px;
+            margin-bottom: 40px;
+        }
+        .msg-special p { font-size: 18px; font-weight: bold; margin-bottom: 15px; }
+        .btn-msg {
+            background: white; color: black; border: none;
+            padding: 10px 20px; border-radius: 20px; font-weight: bold; cursor: pointer;
+        }
+
+        #modal-lyrics {
+            display: none; position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--spotify-bright-orange);
+            z-index: 100; padding: 40px 25px; box-sizing: border-box;
+            overflow-y: auto;
+        }
+        #modal-lyrics.active { display: block; }
+        .full-msg { font-size: 24px; font-weight: bold; line-height: 1.4; margin-top: 60px; }
+    </style>
+</head>
+<body>
+
+<audio id="musica" src="Aliança.mp3"></audio>
+
+<div class="container">
+    <div class="header-top">
+        <i class="fas fa-chevron-down"></i>
+        <span>Eu te Amo</span>
+        <i class="fas fa-ellipsis"></i>
+    </div>
+
+    <img src="Aliança.jpeg" class="main-photo">
+
+    <div class="song-info">
+        <div>
+            <h2>Aliança - Tribalistas</h2>
+            <p>MARISA MONTE</p>
+        </div>
+        <i class="fas fa-check-circle"></i>
+    </div>
+
+    <div class="progress-bar" id="progress-container">
+        <div id="progress-bar-fill"></div>
+    </div>
+    <div class="time">
+        <span id="current-time">0:00</span>
+        <span id="duration-time">-:--</span>
+    </div>
+
+    <div class="controls">
+        <i class="fas fa-random" style="color: #1db954;"></i>
+        <i class="fas fa-step-backward"></i>
+        <button class="play-pause-btn" onclick="togglePlay()">
+            <i class="fas fa-play" id="play-icon"></i>
+        </button>
+        <i class="fas fa-step-forward"></i>
+        <i class="fas fa-redo"></i>
+    </div>
+
+    <div class="card">
+        <span class="overlay-text">Sobre o casal</span>
+        <img src="Imagem1.png" class="couple-photo">
+        <h3>Vinicius Henrique e Agnnes Beatriz</h3>
+        <p style="color:#aaa; font-size:12px; margin:0">Primeiro beijo: 01/02/2026</p>
+        <p style="color:#aaa; font-size:12px; margin:0">Namoro oficial: 21/03/2026</p>
+
+        <div class="timer-grid">
+            <div class="timer-box"><span id="anos">0</span><small>Anos</small></div>
+            <div class="timer-box"><span id="meses">0</span><small>Meses</small></div>
+            <div class="timer-box"><span id="dias">0</span><small>Dias</small></div>
+            <div class="timer-box"><span id="horas">0</span><small>Horas</small></div>
+            <div class="timer-box"><span id="minutos">0</span><small>Minutos</small></div>
+            <div class="timer-box"><span id="segundos">0</span><small>Segundos</small></div>
+        </div>
+    </div>
+
+    <div class="msg-special">
+        <p>Tu és a melhor pessoa que Deus poderia me enviar, és uma pessoa incrível...</p>
+        <button class="btn-msg" onclick="toggleLyrics()">Mostrar Mensagem</button>
+    </div>
+</div>
+
+<div id="modal-lyrics">
+    <i class="fas fa-chevron-down" style="font-size: 24px;" onclick="toggleLyrics()"></i>
+    <div class="full-msg">
+        Você é a melhor pessoa que Deus poderia me enviar. É uma pessoa incrível e não tem noção do quanto é especial para mim. Eu te amo tanto, meu amor! Um dia eu irei te dar o mundo...<br><br> Espera só um pouquinho tá?
+    </div>
+</div>
+
+<script>
+    const audio = document.getElementById('musica');
+    const playIcon = document.getElementById('play-icon');
+    const fill = document.getElementById('progress-bar-fill');
+
+    function togglePlay() {
+        if (audio.paused) {
+            audio.play();
+            playIcon.className = 'fas fa-pause';
+        } else {
+            audio.pause();
+            playIcon.className = 'fas fa-play';
+        }
+    }
+
+    audio.ontimeupdate = () => {
+        const pct = (audio.currentTime / audio.duration) * 100;
+        fill.style.width = pct + '%';
+        document.getElementById('current-time').innerText = formatTime(audio.currentTime);
+    };
+
+    audio.onloadedmetadata = () => {
+        document.getElementById('duration-time').innerText = formatTime(audio.duration);
+    };
+
+    function formatTime(s) {
+        const m = Math.floor(s / 60);
+        const sec = Math.floor(s % 60);
+        return m + ":" + (sec < 10 ? '0' : '') + sec;
+    }
+
+    function updateTimer() {
+        const start = new Date("2026-02-01T00:00:00");
+        const now = new Date();
+        const diff = now - start;
+
+        document.getElementById('anos').innerText = Math.floor(diff / (1000 * 60 * 60 * 24 * 365));
+        document.getElementById('meses').innerText = Math.floor((diff % (1000 * 60 * 60 * 24 * 365)) / (1000 * 60 * 60 * 24 * 30));
+        document.getElementById('dias').innerText = Math.floor((diff % (1000 * 60 * 60 * 24 * 30)) / (1000 * 60 * 60 * 24));
+        document.getElementById('horas').innerText = now.getHours();
+        document.getElementById('minutos').innerText = now.getMinutes();
+        document.getElementById('segundos').innerText = now.getSeconds();
+    }
+
+    setInterval(updateTimer, 1000);
+    updateTimer();
+
+    function toggleLyrics() {
+        document.getElementById('modal-lyrics').classList.toggle('active');
+    }
+</script>
+</body>
+</html>
